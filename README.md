@@ -6,3 +6,5 @@ To run piechart demo, please try:
 pip install -r requirements.txt
 python3 demo_piechart.py
 ```
+
+![Pie chart Inkscape/SVG Demo](./web/pie.svg)

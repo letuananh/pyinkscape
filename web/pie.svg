@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="100mm"
+   height="100mm"
+   viewBox="0 0 400 400"
+   version="1.1"
+   id="svg426"
+   inkscape:version="0.92.4 (unknown)"
+   sodipodi:docname="piedemo.svg">
+  <defs
+     id="defs420" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.98994949"
+     inkscape:cx="227.18909"
+     inkscape:cy="272.82952"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layerManual"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1016"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata423">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layerManual"
+     transform="translate(0,-788.00001)">
+    <path
+       id="_machine__1"
+       style="fill:#999999;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0px"
+       d="M 201.52187,833.0147 A 150,150 0 0 1 350.33908,964.21471 L 201.52187,983.0147 Z"
+       inkscape:connector-curvature="0" />
+    <path
+       id="_machine__2"
+       style="fill:#e69f00;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0px"
+       d="m 350.33908,964.21471 a 150,150 0 0 1 1.18279,18.79999 h -150 z"
+       inkscape:connector-curvature="0" />
+    <path
+       id="_machine__3"
+       style="fill:#56b4e9;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0px"
+       d="m 351.52187,983.0147 a 150,150 0 0 1 -40.65471,102.6821 L 201.52187,983.0147 Z"
+       inkscape:connector-curvature="0" />
+    <path
+       id="_machine__4"
+       style="fill:#009e73;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0px"
+       d="M 310.86716,1085.6968 A 150,150 0 0 1 58.863408,936.66215 L 201.52187,983.0147 Z"
+       inkscape:connector-curvature="0" />
+    <path
+       id="_machine__5"
+       style="fill:#f0e442;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0px"
+       d="m 58.863408,936.66215 a 150,150 0 0 1 47.044862,-69.22443 l 95.6136,115.57698 z"
+       inkscape:connector-curvature="0" />
+    <path
+       id="_machine__6"
+       style="fill:#0072b2;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0px"
+       d="m 105.90827,867.43772 a 150,150 0 0 1 95.6136,-34.42302 v 150 z"
+       inkscape:connector-curvature="0" />
+    <text
+       id="_machine__7"
+       x="201.52188"
+       y="1153.0146"
+       font-size="18px"
+       style="font-size:18px;font-family:sans-serif;text-anchor:middle;fill:#000000">Pie chart, with cream!!!</text>
+    <circle
+       id="_machine__8"
+       style="display:inline;opacity:0.98799995;fill:#00ff00;stroke:#e00000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       cx="201.52188"
+       cy="833.01471"
+       r="3" />
+    <circle
+       id="_machine__9"
+       style="display:inline;opacity:0.98799995;fill:#00ff00;stroke:#e00000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       cx="350.33908"
+       cy="964.21472"
+       r="3" />
+    <circle
+       id="_machine__10"
+       style="display:inline;opacity:0.98799995;fill:#00ff00;stroke:#e00000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       cx="350.33908"
+       cy="964.21472"
+       r="3" />
+    <circle
+       id="_machine__11"
+       style="display:inline;opacity:0.98799995;fill:#00ff00;stroke:#e00000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       cx="351.52188"
+       cy="983.01471"
+       r="3" />
+    <circle
+       id="_machine__12"
+       style="display:inline;opacity:0.98799995;fill:#00ff00;stroke:#e00000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       cx="351.52188"
+       cy="983.01471"
+       r="3" />
+    <circle
+       id="_machine__13"
+       style="display:inline;opacity:0.98799995;fill:#00ff00;stroke:#e00000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       cx="310.86719"
+       cy="1085.6968"
+       r="3" />
+    <circle
+       id="_machine__14"
+       style="display:inline;opacity:0.98799995;fill:#00ff00;stroke:#e00000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       cx="310.86719"
+       cy="1085.6968"
+       r="3" />
+    <circle
+       id="_machine__15"
+       style="display:inline;opacity:0.98799995;fill:#00ff00;stroke:#e00000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       cx="58.863415"
+       cy="936.66217"
+       r="3" />
+    <circle
+       id="_machine__16"
+       style="display:inline;opacity:0.98799995;fill:#00ff00;stroke:#e00000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       cx="58.863415"
+       cy="936.66217"
+       r="3" />
+    <circle
+       id="_machine__17"
+       style="display:inline;opacity:0.98799995;fill:#00ff00;stroke:#e00000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       cx="105.90827"
+       cy="867.43774"
+       r="3" />
+    <circle
+       id="_machine__18"
+       style="display:inline;opacity:0.98799995;fill:#00ff00;stroke:#e00000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       cx="105.90827"
+       cy="867.43774"
+       r="3" />
+    <circle
+       id="_machine__19"
+       style="display:inline;opacity:0.98799995;fill:#00ff00;stroke:#e00000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       cx="201.52188"
+       cy="833.01471"
+       r="3" />
+    <circle
+       id="_machine__20"
+       style="display:inline;opacity:0.98799995;fill:#ff0000;stroke:#e00000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       cx="201.52188"
+       cy="983.01471"
+       r="3" />
+  </g>
+</svg>
