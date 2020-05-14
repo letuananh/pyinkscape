@@ -31,9 +31,8 @@ Latest version can be found at https://github.com/letuananh/pyinkscape
 
 ########################################################################
 
-import itertools
+import logging
 import math
-import lxml
 from lxml import etree
 from chirptext.anhxa import IDGenerator
 from chirptext.cli import setup_logging
@@ -43,6 +42,11 @@ from chirptext.cli import setup_logging
 # ------------------------------------------------------------------------------
 
 setup_logging('logging.json', 'logs')
+
+
+def getLogger():
+    return logging.getLogger(__name__)
+
 
 class Style:
     def __init__(self, **kwargs):
@@ -90,7 +94,7 @@ class Point:
     @staticmethod
     def rotate_percent(point, center, percent):
         degrees = percent * 3.6
-        print(f"Percent: {percent} - Degrees: {degrees}")
+        getLogger().debug(f"Percent: {percent} - Degrees: {degrees}")
         return Point.rotate(point, center, degrees)
 
     
@@ -109,10 +113,10 @@ class Point:
         t_rad = math.radians(theta)
         n_x = point.x - center.x  # shift center point to (0, 0)
         n_y = point.y - center.y
-        print(f"shifted = ({n_x}, {n_y}) - theta (in radians) = {t_rad}")
+        getLogger().debug(f"shifted = ({n_x}, {n_y}) - theta (in radians) = {t_rad}")
         r_x = n_x * math.cos(t_rad) - n_y * math.sin(t_rad)  # rotation matrix
         r_y = n_x * math.sin(t_rad) + n_y * math.cos(t_rad)
-        print(f"new point = ({r_x + center.x}, {r_y + center.y})")
+        getLogger().debug(f"new point = ({r_x + center.x}, {r_y + center.y})")
         return Point(r_x + center.x, r_y + center.y)  # shift it back
 
 
@@ -156,7 +160,7 @@ class Group:
         c.set('r', str(r))
         return Circle(c)
 
-    def new_text(self, text, center, width, height, font_size='18px', font_family="sans-serif", fill="black", text_anchor='middle', style=STYLE_FPNAME, **kwargs):
+    def new_text(self, text, center, width='', height='', font_size='18px', font_family="sans-serif", fill="black", text_anchor='middle', style=STYLE_FPNAME, **kwargs):
         txt = self.new('text')
         center = Point.ensure(center)
         txt.set('x', str(center.x))
@@ -165,6 +169,8 @@ class Group:
         txt.set('font-family', font_family)
         txt.set('fill', fill)
         txt.set('text-anchor', text_anchor)
+        if style:
+            txt.set('style', str(style))        
         for k, v in kwargs.items():
             txt.set(k, str(v))
         txt.text = text
@@ -215,7 +221,7 @@ class Template:
         output = str(self)
         with open(outpath, mode='w') as outfile:
             outfile.write(output)
-            print("Written output to {}".format(outfile.name))
+            getLogger().info("Written output to {}".format(outfile.name))
 
     def getText(self, id):
         elems = self.root.xpath("/ns:svg/ns:g/ns:flowRoot[@id='{id}']/ns:flowPara".format(id=id), namespaces=SVG_NS)
@@ -224,5 +230,5 @@ class Template:
         else:
             # try get <text> element instead of flowRoot ...
             elems = self.root.xpath("/ns:svg/ns:g/ns:text[@id='{id}']/ns:tspan".format(id=id), namespaces=SVG_NS)
-            print(f"Found: {elems}")
+            getLogger().debug(f"Found: {elems}")
             return elems
