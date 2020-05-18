@@ -97,7 +97,7 @@ class Point:
         getLogger().debug(f"Percent: {percent} - Degrees: {degrees}")
         return Point.rotate(point, center, degrees)
 
-    
+
     @staticmethod
     def ensure(p):
         if isinstance(p, Point):
@@ -137,10 +137,10 @@ class Group:
         paths = self.elem.xpath('//ns:path', namespaces=SVG_NS)
         return [Path(p) for p in paths]
 
-    def new(self, tag_name, id=None, style=None):
+    def new(self, tag_name, id=None, style=None, id_prefix=None):
         e = etree.SubElement(self.elem, tag_name)
         if not id:
-            id = new_id()
+            id = new_id(prefix=id_prefix)
         e.set('id', id)
         if style:
             e.set('style', str(style))
@@ -186,6 +186,7 @@ class Shape:
 
 class Text(Shape):
     pass
+
 
 class Circle(Shape):
     pass

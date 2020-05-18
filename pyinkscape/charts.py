@@ -65,6 +65,7 @@ class PieSlide:
         _path = f"M {self.start.x} {self.start.y} A {self.pie.radius.x} {self.pie.radius.y}, {self.pie.rotate}, {large}, 1, {_target.x} {_target.y} L {self.pie.center.x} {self.pie.center.y} Z"
         return _path
 
+
 class PieChart:
     def __init__(self, group, center, radius, slides=None, colors=BLIND_COLORS, rotate=0):
         self.group = group
@@ -77,6 +78,8 @@ class PieChart:
     def slide(self, *percents):
         _slides = []
         for percent in percents:
+            if percent <= 0:
+                continue
             _slide = PieSlide((0, 0), percent, self)
             self.slides.append(_slide)
             _slides.append(_slides)
@@ -89,7 +92,7 @@ class PieChart:
         for slide in self.slides:
             slide.start.x = _sx
             slide.start.y = _sy
-            _path = slide.path() #  (previous=_accu)
+            _path = slide.path()  # (previous=_accu)
             _paths.append(_path)
             _sx = slide.target.x  # move point to the next
             _sy = slide.target.y
@@ -99,9 +102,16 @@ class PieChart:
     def render_slide(self, path, color):
         return self.group.new_path(path, style=STYLE_SLIDE.clone(fill=color))
 
-    def render(self):
-        for path, color in zip(self.paths(), itertools.cycle(self.colors)):
-            self.render_slide(path, color)
+    def render(self, colors=None):
+        _colors = colors if colors else self.colors
+        if len(self.slides) == 1 and self.slides[0].percent == 100:
+            # draw a circle
+            print("Drawing a circle ...")
+            c = self.group.new_circle(self.center, self.radius.x, style=STYLE_SLIDE.clone(fill=_colors[0]), id_prefix="fullmoon")
+            print(c)
+        else:
+            for path, color in zip(self.paths(), itertools.cycle(_colors)):
+                self.render_slide(path, color)
 
 
 def show_locs(pie, group, radius=3):
