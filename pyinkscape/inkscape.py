@@ -222,10 +222,11 @@ class Template:
     def render(self, outpath, overwrite=False):
         if not overwrite and os.path.isfile(outpath):
             getLogger().warn(f"File {outpath} exists. SKIPPED")
-        output = str(self)
-        with open(outpath, mode='w') as outfile:
-            outfile.write(output)
-            getLogger().info("Written output to {}".format(outfile.name))
+        else:
+            output = str(self)
+            with open(outpath, mode='w') as outfile:
+                outfile.write(output)
+                getLogger().info("Written output to {}".format(outfile.name))
 
     def getText(self, id):
         elems = self.root.xpath("/ns:svg/ns:g/ns:flowRoot[@id='{id}']/ns:flowPara".format(id=id), namespaces=SVG_NS)
