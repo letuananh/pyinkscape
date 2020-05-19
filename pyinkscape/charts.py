@@ -106,9 +106,7 @@ class PieChart:
         _colors = colors if colors else self.colors
         if len(self.slides) == 1 and self.slides[0].percent == 100:
             # draw a circle
-            print("Drawing a circle ...")
-            c = self.group.new_circle(self.center, self.radius.x, style=STYLE_SLIDE.clone(fill=_colors[0]), id_prefix="fullmoon")
-            print(c)
+            self.group.new_circle(self.center, self.radius.x, style=STYLE_SLIDE.clone(fill=_colors[0]), id_prefix="fullmoon")
         else:
             for path, color in zip(self.paths(), itertools.cycle(_colors)):
                 self.render_slide(path, color)

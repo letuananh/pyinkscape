@@ -31,6 +31,7 @@ Latest version can be found at https://github.com/letuananh/pyinkscape
 
 ########################################################################
 
+import os
 import logging
 import math
 from lxml import etree
@@ -218,7 +219,9 @@ class Template:
         groups = self.root.xpath(f"/ns:svg/ns:g[@id='{name}']", namespaces=SVG_NS)
         return Group(groups[0]) if groups else None
 
-    def render(self, outpath):
+    def render(self, outpath, overwrite=False):
+        if not overwrite and os.path.isfile(outpath):
+            getLogger().warn(f"File {outpath} exists. SKIPPED")
         output = str(self)
         with open(outpath, mode='w') as outfile:
             outfile.write(output)
