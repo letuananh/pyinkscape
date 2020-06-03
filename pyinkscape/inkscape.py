@@ -34,6 +34,7 @@ Latest version can be found at https://github.com/letuananh/pyinkscape
 import os
 import logging
 import math
+import warnings
 from lxml import etree
 from chirptext.anhxa import IDGenerator
 from chirptext.cli import setup_logging
@@ -77,7 +78,9 @@ BLIND_COLORS = ("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2"
 __idgen = IDGenerator()
 
 
-def new_id(prefix='_machine_'):
+def new_id(prefix=None):
+    if not prefix:
+        prefix = '_pyinkscape_'
     return '{prefix}_{id}'.format(prefix=prefix, id=next(__idgen))
 
 
@@ -126,6 +129,12 @@ class Dimension:
         self.width = width
         self.height = height
 
+    def ensure(p):
+        if isinstance(p, Dimension):
+            return p
+        else:
+            return Dimension(*p)
+
 
 class Group:
     def __init__(self, elem):
@@ -138,22 +147,38 @@ class Group:
         paths = self.elem.xpath('//ns:path', namespaces=SVG_NS)
         return [Path(p) for p in paths]
 
-    def new(self, tag_name, id=None, style=None, id_prefix=None):
+    def new(self, tag_name, id=None, style=None, id_prefix=None, **kwargs):
         e = etree.SubElement(self.elem, tag_name)
         if not id:
             id = new_id(prefix=id_prefix)
         e.set('id', id)
         if style:
             e.set('style', str(style))
+        for k, v in kwargs.items():
+            e.set(str(k), str(v))
         return e
 
-    def new_path(self, path_code, id=None, style=DEFAULT_LINESTYLE, **kwargs):
+    def line(self, from_point, to_point, style=DEFAULT_LINESTYLE, **kwargs):
+        from_point = Point.ensure(from_point)
+        to_point = Point.ensure(to_point)
+        return self.new("line",
+                        x1=from_point.x, y1=from_point.y,
+                        x2=to_point.x, y2=to_point.y,
+                        style=style,
+                        **kwargs)
+
+    def rect(self, topleft, size, style=DEFAULT_LINESTYLE, **kwargs):
+        topleft = Point.ensure(topleft)
+        size = Dimension.ensure(size)
+        return self.new("rect", x=topleft.x, y=topleft.y, width=size.width, height=size.height, style=style, **kwargs)
+
+    def path(self, path_code, id=None, style=DEFAULT_LINESTYLE, **kwargs):
         p = self.new("path", style=style, **kwargs)
         p.set('d', path_code)
         p.set('{http://www.inkscape.org/namespaces/inkscape}connector-curvature', "0")
         return Path(p)
 
-    def new_circle(self, center, r, style=DEFAULT_LINESTYLE, **kwargs):
+    def circle(self, center, r, style=DEFAULT_LINESTYLE, **kwargs):
         center = Point.ensure(center)
         c = self.new("circle", style=style, **kwargs)
         c.set('cx', str(center.x))
@@ -161,8 +186,8 @@ class Group:
         c.set('r', str(r))
         return Circle(c)
 
-    def new_text(self, text, center, width='', height='', font_size='18px', font_family="sans-serif", fill="black", text_anchor='middle', style=STYLE_FPNAME, **kwargs):
-        txt = self.new('text')
+    def text(self, text, center, width='', height='', font_size='18px', font_family="sans-serif", fill="black", text_anchor='middle', style=STYLE_FPNAME, id_prefix=None, **kwargs):
+        txt = self.new('text', id_prefix=id_prefix)
         center = Point.ensure(center)
         txt.set('x', str(center.x))
         txt.set('y', str(center.y))
@@ -176,6 +201,21 @@ class Group:
             txt.set(k, str(v))
         txt.text = text
         return Text(txt)
+
+    @property
+    def new_path(self):
+        warnings.warn("new_path() is deprecated and will be removed in near future.", DeprecationWarning, stacklevel=2)
+        return self.path
+
+    @property
+    def new_circle(self):
+        warnings.warn("new_circle() is deprecated and will be removed in near future.", DeprecationWarning, stacklevel=2)
+        return self.circle
+
+    @property
+    def new_text(self):
+        warnings.warn("new_text() is deprecated and will be removed in near future.", DeprecationWarning, stacklevel=2)
+        return self.text
 
 
 class Shape:
@@ -202,14 +242,18 @@ class Template:
     def __init__(self):
         self.tree = None
 
-    def load(self, filepath):
+    def load(self, filepath, remove_blank_text=True, **kwargs):
         with open(filepath) as infile:
-            self.tree = etree.parse(infile)
+            parser = etree.XMLParser(remove_blank_text=remove_blank_text, **kwargs)
+            self.tree = etree.parse(infile, parser)
             self.root = self.tree.getroot()
         return self
 
+    def to_xml_string(self, encoding="utf-8", pretty_print=True, **kwargs):
+        return etree.tostring(self.root, encoding=encoding, pretty_print=pretty_print, **kwargs).decode('utf-8')
+
     def __str__(self):
-        return etree.tostring(self.root, encoding='utf-8', pretty_print=True).decode('utf-8')
+        return self.to_xml_string()
 
     def groups(self):
         groups = self.root.xpath("/ns:svg/ns:g", namespaces=SVG_NS)
