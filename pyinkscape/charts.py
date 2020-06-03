@@ -99,25 +99,25 @@ class PieChart:
             # _accu += slide.percent  # accumulation
         return _paths
 
-    def render_slide(self, path, color):
-        return self.group.new_path(path, style=STYLE_SLIDE.clone(fill=color))
+    def render_slide(self, path, color, **kwargs):
+        return self.group.path(path, style=STYLE_SLIDE.clone(fill=color), **kwargs)
 
-    def render(self, colors=None):
+    def render(self, colors=None, id_prefix="piechart"):
         _colors = colors if colors else self.colors
         if len(self.slides) == 1 and self.slides[0].percent == 100:
             # draw a circle
-            self.group.new_circle(self.center, self.radius.x, style=STYLE_SLIDE.clone(fill=_colors[0]), id_prefix="fullmoon")
+            self.group.circle(self.center, self.radius.x, style=STYLE_SLIDE.clone(fill=_colors[0]), id_prefix=f"{id_prefix}_circle")
         else:
-            for path, color in zip(self.paths(), itertools.cycle(_colors)):
-                self.render_slide(path, color)
+            for idx, (path, color) in enumerate(zip(self.paths(), itertools.cycle(_colors)), start=1):
+                self.render_slide(path, color, id_prefix=f"{id_prefix}_slide{idx}")
 
 
 def show_locs(pie, group, radius=3):
     ''' Highlight important points of a pie chart '''
     green = STYLE_REDDOT.clone(fill='#00FF00')
     for slide in pie.slides:
-        group.new_circle(slide.start, radius, style=green)
-        group.new_circle(slide.target, radius, style=green)
+        group.circle(slide.start, radius, style=green)
+        group.circle(slide.target, radius, style=green)
     # draw the center point
-    group.new_circle(pie.center, radius, style=STYLE_REDDOT)
+    group.circle(pie.center, radius, style=STYLE_REDDOT)
 
