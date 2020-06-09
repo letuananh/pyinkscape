@@ -95,12 +95,48 @@ class Point:
     def __str__(self):
         return f"Point(x={self.x}, y={self.y})"
 
+    def __eq__(self, other):
+        if not isinstance(other, Point):
+            return NotImplemented
+        return self.x == other.x and self.y == other.y
+
+    def __add__(self, other):
+        if isinstance(other, Point):
+            return Point(self.x + other.x, self.y + other.y)
+        if isinstance(other, Dimension):
+            return Point(self.x + other.width, self.y + other.height)
+        else:
+            return Point(self.x + other, self.y + other)
+
+    def __sub__(self, other):
+        if isinstance(other, Point):
+            return Point(self.x - other.x, self.y - other.y)
+        if isinstance(other, Dimension):
+            return Point(self.x - other.width, self.y - other.height)
+        else:
+            return Point(self.x - other, self.y - other)
+
+    def __mul__(self, other):
+        if isinstance(other, Point):
+            return Point(self.x * other.x, self.y * other.y)
+        if isinstance(other, Dimension):
+            return Point(self.x * other.width, self.y * other.height)
+        else:
+            return Point(self.x * other, self.y * other)
+
+    def __div__(self, other):
+        if isinstance(other, Point):
+            return Point(self.x / other.x, self.y / other.y)
+        if isinstance(other, Dimension):
+            return Point(self.x / other.width, self.y / other.height)
+        else:
+            return Point(self.x / other, self.y / other)
+
     @staticmethod
     def rotate_percent(point, center, percent):
         degrees = percent * 3.6
         getLogger().debug(f"Percent: {percent} - Degrees: {degrees}")
         return Point.rotate(point, center, degrees)
-
 
     @staticmethod
     def ensure(p):
