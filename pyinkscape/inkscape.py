@@ -278,8 +278,8 @@ class Template:
     def __init__(self):
         self.tree = None
 
-    def load(self, filepath, remove_blank_text=True, **kwargs):
-        with open(filepath) as infile:
+    def load(self, filepath, remove_blank_text=True, encoding="utf-8", **kwargs):
+        with open(filepath, encoding=encoding) as infile:
             parser = etree.XMLParser(remove_blank_text=remove_blank_text, **kwargs)
             self.tree = etree.parse(infile, parser)
             self.root = self.tree.getroot()
@@ -299,12 +299,12 @@ class Template:
         groups = self.root.xpath(f"/ns:svg/ns:g[@id='{name}']", namespaces=SVG_NS)
         return Group(groups[0]) if groups else None
 
-    def render(self, outpath, overwrite=False):
+    def render(self, outpath, overwrite=False, encoding="utf-8"):
         if not overwrite and os.path.isfile(outpath):
             getLogger().warn(f"File {outpath} exists. SKIPPED")
         else:
             output = str(self)
-            with open(outpath, mode='w') as outfile:
+            with open(outpath, mode='w', encoding=encoding) as outfile:
                 outfile.write(output)
                 getLogger().info("Written output to {}".format(outfile.name))
 
