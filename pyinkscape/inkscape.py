@@ -43,7 +43,10 @@ from chirptext.cli import setup_logging
 # Configuration
 # ------------------------------------------------------------------------------
 
-setup_logging('logging.json', 'logs')
+try:
+    setup_logging('logging.json', 'logs')
+except Exception:
+    pass
 
 
 def getLogger():
