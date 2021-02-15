@@ -243,17 +243,17 @@ class Group:
 
     @property
     def new_path(self):
-        warnings.warn("new_path() is deprecated and will be removed in near future.", DeprecationWarning, stacklevel=2)
+        warnings.warn("new_path() is deprecated and will be removed in near future, use path() function instead.", DeprecationWarning, stacklevel=2)
         return self.path
 
     @property
     def new_circle(self):
-        warnings.warn("new_circle() is deprecated and will be removed in near future.", DeprecationWarning, stacklevel=2)
+        warnings.warn("new_circle() is deprecated and will be removed in near future, use circle() function instead.", DeprecationWarning, stacklevel=2)
         return self.circle
 
     @property
     def new_text(self):
-        warnings.warn("new_text() is deprecated and will be removed in near future.", DeprecationWarning, stacklevel=2)
+        warnings.warn("new_text() is deprecated and will be removed in near future, use text() function instead.", DeprecationWarning, stacklevel=2)
         return self.text
 
 
@@ -304,7 +304,7 @@ class Template:
 
     def render(self, outpath, overwrite=False, encoding="utf-8"):
         if not overwrite and os.path.isfile(outpath):
-            getLogger().warn(f"File {outpath} exists. SKIPPED")
+            getLogger().warning(f"File {outpath} exists. SKIPPED")
         else:
             output = str(self)
             with open(outpath, mode='w', encoding=encoding) as outfile:
