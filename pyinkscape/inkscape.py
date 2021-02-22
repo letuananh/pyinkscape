@@ -72,9 +72,10 @@ class Style:
         return s
 
 
+INKSCAPE_NS = 'http://www.inkscape.org/namespaces/inkscape'
 SVG_NS = {'ns':'http://www.w3.org/2000/svg',
           'svg': 'http://www.w3.org/2000/svg',
-          'inkscape': 'http://www.inkscape.org/namespaces/inkscape'}
+          'inkscape': INKSCAPE_NS}
 DEFAULT_LINESTYLE = Style(display='inline', fill='none', stroke_width='0.86458332px', stroke_linecap='butt', stroke_linejoin='miter', stroke_opacity='1', stroke='#FF0000')
 STYLE_FPNAME = Style(font_size='20px', font_family='sans-serif', font_style='normal', font_weight='normal', line_height='1.25', letter_spacing='0px', word_spacing='0px', fill='#000000', fill_opacity='1', stroke='none')
 BLIND_COLORS = ("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
@@ -180,7 +181,11 @@ class Group:
         self.elem = elem
         self.ID = elem.get('id')
         self.tag = elem.tag
-        self.label = elem.get('label')
+        self.label = elem.get('{http://www.inkscape.org/namespaces/inkscape}label')
+
+    def delete(self):
+        ''' Remove this group '''
+        self.elem.getparent().remove(self.elem)
 
     def paths(self):
         paths = self.elem.xpath('//ns:path', namespaces=SVG_NS)
@@ -294,13 +299,35 @@ class Template:
     def __str__(self):
         return self.to_xml_string()
 
-    def groups(self):
-        groups = self.root.xpath("/ns:svg/ns:g", namespaces=SVG_NS)
+    def groups(self, layer_only=False):
+        if layer_only:
+            groups = self.root.xpath("//ns:g[@inkscape:groupmode='layer']", namespaces=SVG_NS)
+        else:
+            groups = self.root.xpath("//ns:g", namespaces=SVG_NS)
         return [Group(g) for g in groups]
 
-    def group(self, name):
-        groups = self.root.xpath(f"/ns:svg/ns:g[@id='{name}']", namespaces=SVG_NS)
+    def group(self, name, layer_only=False):
+        if layer_only:
+            groups = self.root.xpath(f"//ns:g[@inkscape:groupmode='layer' and @inkscape:label='{name}']", namespaces=SVG_NS)
+        else:
+            groups = self.root.xpath(f"//ns:g[@inkscape:label='{name}']", namespaces=SVG_NS)
         return Group(groups[0]) if groups else None
+
+    def group_by_id(self, id, layer_only=False):
+        if layer_only:
+            groups = self.root.xpath(f"/ns:svg/ns:g[@id='{id}']", namespaces=SVG_NS)
+        else:
+            groups = self.root.xpath(f"//ns:g[@id='{id}']", namespaces=SVG_NS)
+        return Group(groups[0]) if groups else None
+
+    def layers(self):
+        return self.groups(layer_only=True)
+
+    def layer(self, name):
+        return self.group(name, layer_only=True)
+
+    def layer_by_id(self, id):
+        return self.group_by_id(id=id, layer_only=True)
 
     def render(self, outpath, overwrite=False, encoding="utf-8"):
         if not overwrite and os.path.isfile(outpath):
