@@ -8,8 +8,6 @@ Welcome to pyInkscape's documentation!
 
 pyInkscape is a library for manipulating Inkscape SVG content using Python 3.
 
-
-
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
@@ -18,9 +16,15 @@ pyInkscape is a library for manipulating Inkscape SVG content using Python 3.
    recipes
    api
 
+Useful Links
+------------
+
+- pyInkscape documentation: https://pyinkscape.readthedocs.io/
+- pyInkscape on PyPI: https://pypi.org/project/pyinkscape/
+- Soure code: https://github.com/letuananh/pyinkscape/
 
 Indices and tables
-==================
+------------------
 
 * :ref:`genindex`
 * :ref:`modindex`

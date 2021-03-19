@@ -16,3 +16,4 @@ python3 demo_piechart.py
 
 - pyInkscape documentation: https://pyinkscape.readthedocs.io/
 - pyInkscape on PyPI: https://pypi.org/project/pyinkscape/
+- Soure code: https://github.com/letuananh/pyinkscape/
