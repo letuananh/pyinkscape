@@ -32,7 +32,7 @@ Latest version can be found at https://github.com/letuananh
 ########################################################################
 
 import pyinkscape
-from pyinkscape import Template, PieChart
+from pyinkscape import Canvas, PieChart
 from pyinkscape.charts import show_locs
 
 
@@ -50,7 +50,7 @@ print()
 # Draw a sample pie chart
 # ------------------------------------------------------------------------------
 # 1. Open an Inkscape SVG file
-t2 = Template().load('templates/canvas.svg')
+t2 = Canvas('templates/canvas.svg')  # or use Template() to create an empty canvas
 # find a group by name
 g2 = t2.group('Layer 1')  # Search by layer name, can also try: .group_by_id('layerManual')
 
