@@ -35,6 +35,7 @@ import os
 import logging
 import math
 import warnings
+from pathlib import Path
 try:
     from lxml import etree
     from lxml.etree import XMLParser
@@ -71,6 +72,10 @@ except Exception as e:
                         break
                 return valid_id
 
+
+_MY_DIR = Path(os.path.dirname(os.path.realpath(__file__)))
+_BLANK_CANVAS = _MY_DIR / 'data' / 'blank.svg'
+
 # ------------------------------------------------------------------------------
 # use chirptext setup_logging if possible
 try:
@@ -106,8 +111,14 @@ class Style:
 
 
 INKSCAPE_NS = 'http://www.inkscape.org/namespaces/inkscape'
-SVG_NS = {'ns':'http://www.w3.org/2000/svg',
-          'svg': 'http://www.w3.org/2000/svg',
+SVG_NS = 'http://www.w3.org/2000/svg'
+SVG_NAMESPACES = {'ns': SVG_NS,
+          'svg': SVG_NS,
+          'dc': "http://purl.org/dc/elements/1.1/",
+          'cc': "http://creativecommons.org/ns#",
+          'rdf': "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+
+          "sodipodi": "http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd",
           'inkscape': INKSCAPE_NS}
 DEFAULT_LINESTYLE = Style(display='inline', fill='none', stroke_width='0.86458332px', stroke_linecap='butt', stroke_linejoin='miter', stroke_opacity='1', stroke='#FF0000')
 STYLE_FPNAME = Style(font_size='20px', font_family='sans-serif', font_style='normal', font_weight='normal', line_height='1.25', letter_spacing='0px', word_spacing='0px', fill='#000000', fill_opacity='1', stroke='none')
@@ -122,7 +133,7 @@ def new_id(prefix=None):
 
 
 class Point:
-    def __init__(self, x, y):
+    def __init__(self, x: float, y: float):
         self.x = x
         self.y = y
 
@@ -183,8 +194,13 @@ class Point:
             return Point(*p)
 
     @staticmethod
-    def rotate(point, center, theta):
-        ''' theta is the rotating angle, in degrees '''
+    def rotate(point, center, theta: float):
+        ''' Rotate a `point` around a `center` point by `theta` degrees
+
+        :param point: The point to rotate
+        :param center: The center point of the rotation
+        :param theta: Rotating angle, in degrees
+        '''
         point = Point.ensure(point)
         center = Point.ensure(center)
         t_rad = math.radians(theta)
@@ -209,19 +225,63 @@ class Dimension:
             return Dimension(*p)
 
 
+class BBox():
+    ''' A bounding box represents by a top-left anchor (x1, y1) and a dimension (width, height) '''
+    
+    def __init__(self, x, y, width, height):
+        self.__anchor = Point(x, y)
+        self.__dimension = Dimension(width, height)
+
+    @property
+    def x1(self):
+        ''' x value of the top-left anchor '''
+        return self.__anchor.x
+
+    @property
+    def y1(self):
+        ''' y value of the top-left anchor '''
+        return self.__anchor.y
+
+    @property
+    def width(self):
+        ''' Width of the bounding box '''
+        return self.__dimension.width
+
+    @property
+    def height(self):
+        ''' Height of the bounding box '''
+        return self.__dimension.height
+
+    @property
+    def x2(self):
+        return self.__anchor.x + self.__dimension.width
+
+    @property
+    def y2(self):
+        return self.__anchor.y + self.__dimension.height
+
+    def to_tuple(self) -> tuple:
+        return (self.x1, self.y1, self.width, self.height)
+
+    def __str__(self):
+        return f"{self.x1} {self.y1} {self.width} {self.height}"
+
+
 class Group:
-    def __init__(self, elem):
+    def __init__(self, elem, parent_elem):
         self.elem = elem
+        self.parent_elem = parent_elem
         self.ID = elem.get('id')
         self.tag = elem.tag
         self.label = elem.get('{http://www.inkscape.org/namespaces/inkscape}label')
 
     def delete(self):
         ''' Remove this group '''
-        self.elem.getparent().remove(self.elem)
+        self.parent_elem.remove(self.elem)
+        # self.elem.getparent().remove(self.elem)
 
     def paths(self):
-        paths = self.elem.xpath('//ns:path', namespaces=SVG_NS)
+        paths = self.elem.xpath('//ns:path', namespaces=SVG_NAMESPACES)
         return [Path(p) for p in paths]
 
     def new(self, tag_name, id=None, style=None, id_prefix=None, **kwargs):
@@ -235,35 +295,35 @@ class Group:
             e.set(str(k), str(v))
         return e
 
-    def line(self, from_point, to_point, style=DEFAULT_LINESTYLE, **kwargs):
+    def line(self, from_point, to_point, style=DEFAULT_LINESTYLE, id_prefix='__pyinkscape_line', **kwargs):
         from_point = Point.ensure(from_point)
         to_point = Point.ensure(to_point)
         return self.new("line",
                         x1=from_point.x, y1=from_point.y,
                         x2=to_point.x, y2=to_point.y,
-                        style=style,
+                        style=style, id_prefix=id_prefix,
                         **kwargs)
 
-    def rect(self, topleft, size, style=DEFAULT_LINESTYLE, **kwargs):
+    def rect(self, topleft, size, style=DEFAULT_LINESTYLE, id_prefix='__pyinkscape_rect', **kwargs):
         topleft = Point.ensure(topleft)
         size = Dimension.ensure(size)
-        return self.new("rect", x=topleft.x, y=topleft.y, width=size.width, height=size.height, style=style, **kwargs)
+        return self.new("rect", x=topleft.x, y=topleft.y, width=size.width, height=size.height, style=style, id_prefix=id_prefix, **kwargs)
 
-    def path(self, path_code, id=None, style=DEFAULT_LINESTYLE, **kwargs):
-        p = self.new("path", style=style, **kwargs)
+    def path(self, path_code, id=None, style=DEFAULT_LINESTYLE, id_prefix='__pyinkscape_path', **kwargs):
+        p = self.new("path", style=style, id_prefix=id_prefix, **kwargs)
         p.set('d', path_code)
         p.set('{http://www.inkscape.org/namespaces/inkscape}connector-curvature', "0")
         return Path(p)
 
-    def circle(self, center, r, style=DEFAULT_LINESTYLE, **kwargs):
+    def circle(self, center, r, style=DEFAULT_LINESTYLE, id_prefix='__pyinkscape_circle', **kwargs):
         center = Point.ensure(center)
-        c = self.new("circle", style=style, **kwargs)
+        c = self.new("circle", style=style, id_prefix=id_prefix, **kwargs)
         c.set('cx', str(center.x))
         c.set('cy', str(center.y))
         c.set('r', str(r))
         return Circle(c)
 
-    def text(self, text, center, width='', height='', font_size='18px', font_family="sans-serif", fill="black", text_anchor='middle', style=STYLE_FPNAME, id_prefix=None, **kwargs):
+    def text(self, text, center, width='', height='', font_size='18px', font_family="sans-serif", fill="black", text_anchor='middle', style=STYLE_FPNAME, id_prefix='__pyinkscape_text', **kwargs):
         txt = self.new('text', id_prefix=id_prefix)
         center = Point.ensure(center)
         txt.set('x', str(center.x))
@@ -278,21 +338,6 @@ class Group:
             txt.set(k, str(v))
         txt.text = text
         return Text(txt)
-
-    @property
-    def new_path(self):
-        warnings.warn("new_path() is deprecated and will be removed in near future, use path() function instead.", DeprecationWarning, stacklevel=2)
-        return self.path
-
-    @property
-    def new_circle(self):
-        warnings.warn("new_circle() is deprecated and will be removed in near future, use circle() function instead.", DeprecationWarning, stacklevel=2)
-        return self.circle
-
-    @property
-    def new_text(self):
-        warnings.warn("new_text() is deprecated and will be removed in near future, use text() function instead.", DeprecationWarning, stacklevel=2)
-        return self.text
 
 
 class Shape:
@@ -314,64 +359,184 @@ class Path(Shape):
     pass
 
 
-class Template:
+class Canvas:
 
-    def __init__(self):
-        self.tree = None
+    FILEPATH_MEMORY = ':memory:'
+    
+    def __init__(self, filepath=FILEPATH_MEMORY, *args, **kwargs):
+        self.__filepath = filepath
+        self.__tree = None
+        self.__root = None
+        self.__units = 'mm'
+        self.__width = 0
+        self.__height = 0
+        self.__viewbox = None
+        self.__scale = 1.0
+        self.__elem_group_map = dict()
+        if filepath is not None:
+            self.__load_file(*args, **kwargs)
 
-    def load(self, filepath, remove_blank_text=True, encoding="utf-8", **kwargs):
-        with open(filepath, encoding=encoding) as infile:
+    def __load_file(self, remove_blank_text=True, encoding="utf-8", **kwargs):
+        with open(_BLANK_CANVAS if self.__filepath == Canvas.FILEPATH_MEMORY else self.__filepath, encoding=encoding) as infile:
             if _LXML_AVAILABLE:
                 kwargs['remove_blank_text'] = remove_blank_text  # this flag is lxml specific
             parser = XMLParser(**kwargs)
-            self.tree = etree.parse(infile, parser)
-            self.root = self.tree.getroot()
-        return self
+            if not _LXML_AVAILABLE:
+                for k, v in SVG_NAMESPACES.items():
+                    etree.register_namespace(k, v)
+                # register SVG as the default namespace
+                etree.register_namespace('', SVG_NS)
+            self.__tree = etree.parse(infile, parser)
+            self.__root = self.__tree.getroot()
+            self.__update_vsg_info()
+
+    def __update_vsg_info(self):
+        # load SVG information
+        if self.__svg_node.get('width'):
+            self.__units = self.__svg_node.get('width')[-2:]
+            self.__width = float(self.__svg_node.get('width')[:-2])
+        if self.__svg_node.get('height'):
+            self.__height = float(self.__svg_node.get('height')[:-2])
+        if self.__svg_node.get('viewBox'):
+            self.__viewbox = BBox(*(float(x) for x in self.__svg_node.get('viewBox').split()))
+            if not self.__width:
+                self.__width = self.__viewbox.width
+            if not self.__height:
+                self.__width = self.__viewbox.height
+        if self.viewBox and self.__width:
+            self.__scale = self.viewBox.width / self.__width
+
+    def __parent_map(self):
+        return {c: p for p in self.__tree.iter() for c in p}
+
+    def __build_group(self, elem):
+        if elem not in self.__elem_group_map:
+            if _LXML_AVAILABLE:
+                _group_obj = Group(elem, elem.getparent())
+            else:
+                _group_obj = Group(elem, self.__parent_map()[elem])
+            self.__elem_group_map[elem] = _group_obj
+        return self.__elem_group_map[elem]
+
+    @property
+    def __svg_node(self):
+        return self.__root
+
+    @property
+    def units(self):
+        return self.__units
+
+    @property
+    def width(self):
+        return self.__width
+
+    @property
+    def height(self):
+        return self.__height
+
+    @property
+    def scale(self):
+        return self.__scale
+
+    @property
+    def viewBox(self):
+        return self.__viewbox
+
+    @property
+    def version(self):
+        return self.__svg_node.get('version')
+
+    @property
+    def inkscape_version(self):
+        return self.__svg_node.get('{http://www.inkscape.org/namespaces/inkscape}version')
+
+    @property
+    def docname(self):
+        return self.__svg_node.get('{http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd}docname')
+
+    @docname.setter
+    def docname(self, value):
+        return self.__svg_node.set('{http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd}docname', value)
+
+    @staticmethod
+    def load(filepath, encoding="utf-8", remove_blank_text=True, **kwargs):
+        warnings.warn("load() is deprecated and will be removed in near future, use Canvas constructor instead.", DeprecationWarning, stacklevel=2)
+        return Canvas(filepath=filepath, encoding=encoding, remove_blank_text=remove_blank_text, **kwargs)
 
     def to_xml_string(self, encoding="utf-8", pretty_print=True, **kwargs):
         if _LXML_AVAILABLE:
-            return etree.tostring(self.root, encoding=encoding, pretty_print=pretty_print, **kwargs).decode('utf-8')
+            return etree.tostring(self.__root, encoding=encoding, pretty_print=pretty_print, **kwargs).decode('utf-8')
         else:
-            etree.register_namespace('', 'http://www.w3.org/2000/svg')
-            return etree.tostring(self.root, encoding=encoding, **kwargs).decode('utf-8')
+            return etree.tostring(self.__root, encoding=encoding, **kwargs).decode('utf-8')
 
     def __str__(self):
         return self.to_xml_string()
 
     def _xpath_query(self, query_string, namespaces=None):
         if _LXML_AVAILABLE:
-            return self.root.xpath(query_string, namespaces=namespaces) 
+            return self.__root.xpath(query_string, namespaces=namespaces) 
         else:
-            return self.tree.findall(query_string, namespaces=namespaces) 
+            return self.__tree.findall(query_string, namespaces=namespaces)
 
     def groups(self, layer_only=False):
         if layer_only:
-            groups = self._xpath_query("//ns:g[@inkscape:groupmode='layer']", namespaces=SVG_NS)
+            groups = self._xpath_query(".//ns:g[@inkscape:groupmode='layer']", namespaces=SVG_NAMESPACES)
         else:
-            groups = self._xpath_query("//ns:g", namespaces=SVG_NS)
-        return [Group(g) for g in groups]
+            groups = self._xpath_query(".//ns:g", namespaces=SVG_NAMESPACES)
+        return [self.__build_group(g) for g in groups]
 
     def group(self, name, layer_only=False):
         if layer_only:
-            groups = self._xpath_query(f"//ns:g[@inkscape:groupmode='layer' and @inkscape:label='{name}']", namespaces=SVG_NS)
+            if _LXML_AVAILABLE:
+                groups = self._xpath_query(f".//ns:g[@inkscape:groupmode='layer' and @inkscape:label='{name}']", namespaces=SVG_NAMESPACES)
+            else:
+                groups = self._xpath_query(f".//ns:g[@inkscape:groupmode='layer'][@inkscape:label='{name}']", namespaces=SVG_NAMESPACES)
         else:
-            groups = self._xpath_query(f".//ns:g[@inkscape:label='{name}']", namespaces=SVG_NS)
-        return Group(groups[0]) if groups else None
+            groups = self._xpath_query(f".//ns:g[@inkscape:label='{name}']", namespaces=SVG_NAMESPACES)
+        if groups:
+            return self.__build_group(groups[0])
+        else:
+            # some groups in Inkscape have empty name and use ID as name instead
+            _try_group = self.group_by_id(name, layer_only=layer_only)
+            if _try_group and not _try_group.label:
+                return _try_group
+            else:
+                return None
 
     def group_by_id(self, id, layer_only=False):
         if layer_only:
-            groups = self._xpath_query(f"/ns:svg/ns:g[@id='{id}']", namespaces=SVG_NS)
+            if _LXML_AVAILABLE:
+                groups = self._xpath_query(f".//ns:g[@inkscape:groupmode='layer' and @id='{id}']", namespaces=SVG_NAMESPACES)
+            else:
+                groups = self._xpath_query(f".//ns:g[@inkscape:groupmode='layer'][@id='{id}']", namespaces=SVG_NAMESPACES)
         else:
-            groups = self._xpath_query(f".//ns:g[@id='{id}']", namespaces=SVG_NS)
-        return Group(groups[0]) if groups else None
+            groups = self._xpath_query(f".//ns:g[@id='{id}']", namespaces=SVG_NAMESPACES)
+        return self.__build_group(groups[0]) if groups else None
 
     def layers(self):
+        ''' Get all available layers in this canvas '''
         return self.groups(layer_only=True)
 
-    def layer(self, name):
+    def layer(self, name: str) -> Group:
+        ''' Find the first layer with a name 
+
+        Layer names are not unique. If there are multiple layers with the same name, only the first one will be returned 
+        
+        :param name: Name of the layer to search (Note: Layer names a not unique)
+        :returns: A `Group` object if found, or None
+        :rtype: pyinkscape.inkscape.Group
+        '''
         return self.group(name, layer_only=True)
 
     def layer_by_id(self, id):
+        ''' Find the first layer with an ID
+
+        Layer IDs are unique
+
+        :param id: ID of the layer to search
+        :returns: A `Group` object if found, or None
+        :rtype: pyinkscape.inkscape.Group
+        '''
         return self.group_by_id(id=id, layer_only=True)
 
     def render(self, outpath, overwrite=False, encoding="utf-8"):
@@ -384,11 +549,11 @@ class Template:
                 getLogger().info("Written output to {}".format(outfile.name))
 
     def getText(self, id):
-        elems = self._xpath_query("/ns:svg/ns:g/ns:flowRoot[@id='{id}']/ns:flowPara".format(id=id), namespaces=SVG_NS)
+        elems = self._xpath_query("/ns:svg/ns:g/ns:flowRoot[@id='{id}']/ns:flowPara".format(id=id), namespaces=SVG_NAMESPACES)
         if elems:
             return elems
         else:
             # try get <text> element instead of flowRoot ...
-            elems = self._xpath_query("/ns:svg/ns:g/ns:text[@id='{id}']/ns:tspan".format(id=id), namespaces=SVG_NS)
+            elems = self._xpath_query("/ns:svg/ns:g/ns:text[@id='{id}']/ns:tspan".format(id=id), namespaces=SVG_NAMESPACES)
             getLogger().debug(f"Found: {elems}")
             return elems
