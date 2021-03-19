@@ -1,0 +1,2 @@
+include pyinkscape/data/blank.svg
+recursive-include test/data *.svg
