@@ -35,7 +35,15 @@ import os
 import logging
 import math
 import warnings
-from lxml import etree
+try:
+    from lxml import etree
+    from lxml.etree import XMLParser
+    _LXML_AVAILABLE = True
+except Exception as e:
+    # logging.getLogger(__name__).debug("lxml is not available, fall back to xml.etree.ElementTree")
+    from xml.etree import ElementTree as etree
+    from xml.etree.ElementTree import XMLParser
+    _LXML_AVAILABLE = False
 from chirptext.anhxa import IDGenerator
 from chirptext.cli import setup_logging
 
@@ -288,36 +296,47 @@ class Template:
 
     def load(self, filepath, remove_blank_text=True, encoding="utf-8", **kwargs):
         with open(filepath, encoding=encoding) as infile:
-            parser = etree.XMLParser(remove_blank_text=remove_blank_text, **kwargs)
+            if _LXML_AVAILABLE:
+                kwargs['remove_blank_text'] = remove_blank_text  # this flag is lxml specific
+            parser = XMLParser(**kwargs)
             self.tree = etree.parse(infile, parser)
             self.root = self.tree.getroot()
         return self
 
     def to_xml_string(self, encoding="utf-8", pretty_print=True, **kwargs):
-        return etree.tostring(self.root, encoding=encoding, pretty_print=pretty_print, **kwargs).decode('utf-8')
+        if _LXML_AVAILABLE:
+            return etree.tostring(self.root, encoding=encoding, pretty_print=pretty_print, **kwargs).decode('utf-8')
+        else:
+            return etree.tostring(self.root, encoding=encoding, **kwargs).decode('utf-8')
 
     def __str__(self):
         return self.to_xml_string()
 
+    def _xpath_query(self, query_string, namespaces=None):
+        if _LXML_AVAILABLE:
+            return self.root.xpath(query_string, namespaces=namespaces) 
+        else:
+            return self.tree.findall(query_string, namespaces=namespaces) 
+
     def groups(self, layer_only=False):
         if layer_only:
-            groups = self.root.xpath("//ns:g[@inkscape:groupmode='layer']", namespaces=SVG_NS)
+            groups = self._xpath_query("//ns:g[@inkscape:groupmode='layer']", namespaces=SVG_NS)
         else:
-            groups = self.root.xpath("//ns:g", namespaces=SVG_NS)
+            groups = self._xpath_query("//ns:g", namespaces=SVG_NS)
         return [Group(g) for g in groups]
 
     def group(self, name, layer_only=False):
         if layer_only:
-            groups = self.root.xpath(f"//ns:g[@inkscape:groupmode='layer' and @inkscape:label='{name}']", namespaces=SVG_NS)
+            groups = self._xpath_query(f"//ns:g[@inkscape:groupmode='layer' and @inkscape:label='{name}']", namespaces=SVG_NS)
         else:
-            groups = self.root.xpath(f"//ns:g[@inkscape:label='{name}']", namespaces=SVG_NS)
+            groups = self._xpath_query(f".//ns:g[@inkscape:label='{name}']", namespaces=SVG_NS)
         return Group(groups[0]) if groups else None
 
     def group_by_id(self, id, layer_only=False):
         if layer_only:
-            groups = self.root.xpath(f"/ns:svg/ns:g[@id='{id}']", namespaces=SVG_NS)
+            groups = self._xpath_query(f"/ns:svg/ns:g[@id='{id}']", namespaces=SVG_NS)
         else:
-            groups = self.root.xpath(f"//ns:g[@id='{id}']", namespaces=SVG_NS)
+            groups = self._xpath_query(f".//ns:g[@id='{id}']", namespaces=SVG_NS)
         return Group(groups[0]) if groups else None
 
     def layers(self):
@@ -339,11 +358,11 @@ class Template:
                 getLogger().info("Written output to {}".format(outfile.name))
 
     def getText(self, id):
-        elems = self.root.xpath("/ns:svg/ns:g/ns:flowRoot[@id='{id}']/ns:flowPara".format(id=id), namespaces=SVG_NS)
+        elems = self._xpath_query("/ns:svg/ns:g/ns:flowRoot[@id='{id}']/ns:flowPara".format(id=id), namespaces=SVG_NS)
         if elems:
             return elems
         else:
             # try get <text> element instead of flowRoot ...
-            elems = self.root.xpath("/ns:svg/ns:g/ns:text[@id='{id}']/ns:tspan".format(id=id), namespaces=SVG_NS)
+            elems = self._xpath_query("/ns:svg/ns:g/ns:text[@id='{id}']/ns:tspan".format(id=id), namespaces=SVG_NS)
             getLogger().debug(f"Found: {elems}")
             return elems
