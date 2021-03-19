@@ -31,20 +31,40 @@ Latest version can be found at https://github.com/letuananh
 
 ########################################################################
 
+import pyinkscape
 from pyinkscape import Template, PieChart
 from pyinkscape.charts import show_locs
+
+
+# ------------------------------------------------------------------------------
+# Development information
+# ------------------------------------------------------------------------------
+print("-" * 60)
+print("pyInkscape demo pie chart code")
+print("-" * 60)
+print(f"lxml available: {pyinkscape.inkscape._LXML_AVAILABLE}")
+print(f"chirptext available: {pyinkscape.inkscape._CHIRPTEXT_AVAILABLE}")
+print()
 
 # ------------------------------------------------------------------------------
 # Draw a sample pie chart
 # ------------------------------------------------------------------------------
-
+# 1. Open an Inkscape SVG file
 t2 = Template().load('templates/canvas.svg')
+# find a group by name
 g2 = t2.group('Layer 1')  # Search by layer name, can also try: .group_by_id('layerManual')
+
+# 2. Drawing 
+# Create a pie chart object
 pie = PieChart(g2, center=(200, 200), radius=(150, 150))
 pie.slide(23, 2, 12, 43, 9, 11)
-pie.render()  # render pie chart
-g2.new_text("Pie chart, with cream!!!", center=(200, 370), width=200, height=200)
+# Draw the pie chart
+pie.render()
+# Draw a text
+g2.text("Pie chart, with cream!!!", center=(200, 370), width=200, height=200)
+# Show locations on pie chart
 show_locs(pie, g2)
-t2.render('output/piedemo.svg')
 
-print("Done!")
+# 3. Generate output SVG file
+# Add overwrite=True to bypass pyInkscape overwrite protection
+t2.render('output/piedemo.svg', overwrite=True)
