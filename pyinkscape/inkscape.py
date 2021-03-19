@@ -307,6 +307,7 @@ class Template:
         if _LXML_AVAILABLE:
             return etree.tostring(self.root, encoding=encoding, pretty_print=pretty_print, **kwargs).decode('utf-8')
         else:
+            etree.register_namespace('', 'http://www.w3.org/2000/svg')
             return etree.tostring(self.root, encoding=encoding, **kwargs).decode('utf-8')
 
     def __str__(self):
