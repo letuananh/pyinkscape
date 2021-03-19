@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
+   xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -14,10 +13,32 @@
    viewBox="0 0 840 1188"
    version="1.1"
    id="svg426"
-   inkscape:version="0.92.4 (unknown)"
-   sodipodi:docname="pie_only.svg">
+   inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)"
+   sodipodi:docname="canvas.svg">
   <defs
-     id="defs420" />
+     id="defs420">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient2799"
+       osb:paint="gradient">
+      <stop
+         style="stop-color:#e60000;stop-opacity:1;"
+         offset="0"
+         id="stop2795" />
+      <stop
+         style="stop-color:#dbd7b8;stop-opacity:0;"
+         offset="1"
+         id="stop2797" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient2791"
+       osb:paint="solid">
+      <stop
+         style="stop-color:#f6ffff;stop-opacity:1;"
+         offset="0"
+         id="stop2789" />
+    </linearGradient>
+  </defs>
   <sodipodi:namedview
      id="base"
      pagecolor="#ffffff"
@@ -25,17 +46,18 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.8"
-     inkscape:cx="112.54623"
-     inkscape:cy="966.0639"
+     inkscape:zoom="0.70710678"
+     inkscape:cx="693.80441"
+     inkscape:cy="610.09445"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="layerManual"
      showgrid="false"
      inkscape:window-width="1920"
-     inkscape:window-height="1016"
-     inkscape:window-x="0"
-     inkscape:window-y="27"
-     inkscape:window-maximized="1" />
+     inkscape:window-height="1057"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:document-rotation="0" />
   <metadata
      id="metadata423">
     <rdf:RDF>
@@ -52,5 +74,13 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layerManual">
+    <rect
+       style="opacity:0.995;fill:none;fill-opacity:1;stroke:#e60000;stroke-width:9.77234;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect7"
+       width="829.98657"
+       height="1178.3687"
+       x="4.7195816"
+       y="4.7195821"
+       inkscape:label="border" />
   </g>
 </svg>
