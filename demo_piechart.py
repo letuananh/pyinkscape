@@ -39,7 +39,7 @@ from pyinkscape.charts import show_locs
 # ------------------------------------------------------------------------------
 
 t2 = Template().load('templates/canvas.svg')
-g2 = t2.group('layerManual')
+g2 = t2.group('Layer 1')  # Search by layer name, can also try: .group_by_id('layerManual')
 pie = PieChart(g2, center=(200, 200), radius=(150, 150))
 pie.slide(23, 2, 12, 43, 9, 11)
 pie.render()  # render pie chart
