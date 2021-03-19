@@ -44,17 +44,42 @@ except Exception as e:
     from xml.etree import ElementTree as etree
     from xml.etree.ElementTree import XMLParser
     _LXML_AVAILABLE = False
-from chirptext.anhxa import IDGenerator
-from chirptext.cli import setup_logging
+try:
+    from chirptext.anhxa import IDGenerator
+    from chirptext.cli import setup_logging
+    _CHIRPTEXT_AVAILABLE = True
+except Exception as e:
+    _CHIRPTEXT_AVAILABLE = False
+    # When chirptext is not available, fall back to built-in IDGenerator
+    # IDGenerator class is adopted from:
+    # https://github.com/letuananh/chirptext/blob/master/chirptext/anhxa.py
+    import threading
+    class IDGenerator(object):
 
-# -------------------------------------------------------------------------------
-# Configuration
+        def __init__(self, id_seed=1, id_hook=None):
+            ''' id_seed = starting number '''
+            self.__id_seed = id_seed
+            self.__id_check_hook = id_hook  # external ID checker
+            self.__lock = threading.Lock()
+
+        def __next__(self):
+            with self.__lock:
+                while True:
+                    valid_id = self.__id_seed
+                    self.__id_seed += 1
+                    if self.__id_check_hook is None or not self.__id_check_hook(valid_id):
+                        break
+                return valid_id
+
 # ------------------------------------------------------------------------------
-
+# use chirptext setup_logging if possible
 try:
     setup_logging('logging.json', 'logs')
 except Exception:
     pass
+# -------------------------------------------------------------------------------
+# Configuration
+# ------------------------------------------------------------------------------
 
 
 def getLogger():

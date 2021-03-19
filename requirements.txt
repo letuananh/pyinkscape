@@ -1,2 +1,0 @@
-lxml
-chirptext >= 0.1a18
