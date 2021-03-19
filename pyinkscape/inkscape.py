@@ -268,6 +268,9 @@ class BBox():
 
 
 class Group:
+
+    ''' Represents either a group (composite object) or a layer (special group) '''
+    
     def __init__(self, elem, parent_elem):
         self.elem = elem
         self.parent_elem = parent_elem
@@ -276,7 +279,7 @@ class Group:
         self.label = elem.get('{http://www.inkscape.org/namespaces/inkscape}label')
 
     def delete(self):
-        ''' Remove this group '''
+        ''' Remove this group/layer from a canvas '''
         self.parent_elem.remove(self.elem)
         # self.elem.getparent().remove(self.elem)
 
@@ -295,7 +298,12 @@ class Group:
             e.set(str(k), str(v))
         return e
 
-    def line(self, from_point, to_point, style=DEFAULT_LINESTYLE, id_prefix='__pyinkscape_line', **kwargs):
+    def line(self, from_point, to_point, style: Style=DEFAULT_LINESTYLE, id_prefix='__pyinkscape_line', **kwargs):
+        ''' Draw a new line between two points using a style
+    
+        :param style: A `Style` object
+        :type style: pyinkscape.inkscape.Style
+        '''
         from_point = Point.ensure(from_point)
         to_point = Point.ensure(to_point)
         return self.new("line",
@@ -361,9 +369,22 @@ class Path(Shape):
 
 class Canvas:
 
+    ''' This class represents an Inkscape drawing page (i.e. a SVG file) '''
+
     FILEPATH_MEMORY = ':memory:'
     
     def __init__(self, filepath=FILEPATH_MEMORY, *args, **kwargs):
+        ''' Create a new blank canvas or read from an existing file.
+
+        To create a blank canvas, just ignore the filepath property.
+        >>> c = Canvas()
+
+        To open an existing file, use
+        >>> c = Canvas("/path/to/file.svg")
+
+        :param filepath: Path to an existing SVG file.
+        :type filepath: str
+        '''
         self.__filepath = filepath
         self.__tree = None
         self.__root = None
