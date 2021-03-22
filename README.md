@@ -1,6 +1,6 @@
 # pyinkscape
 
-[![ReadTheDocs Badge](https://readthedocs.org/projects/pip/badge/?version=latest&style=plastic)](https://pyinkscape.readthedocs.io/)
+[![ReadTheDocs Badge](https://readthedocs.org/projects/pyinkscape/badge/?version=latest&style=plastic)](https://pyinkscape.readthedocs.io/)
 
 A library to manipulate Inkscape SVG content using Python 3
 
