@@ -2,3 +2,4 @@
 # pyInkscape can run by itself without any dependencies
 lxml
 chirptext >= 0.1a18
+PyPDF2
