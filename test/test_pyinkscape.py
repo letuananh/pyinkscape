@@ -80,7 +80,7 @@ class TestSelectingObject(unittest.TestCase):
         self.assertIsNotNone(l1)
         l2 = c.layer_by_id('layer1')
         self.assertIsNotNone(l2)
-        self.assertNotEqual(l1, l2)
+        self.assertEqual(l1, l2)  # same object
         self.assertEqual((l1.ID, l1.label, l1.elem), (l2.ID, l2.label, l2.elem))
 
     def test_group_search(self):
@@ -121,7 +121,6 @@ class TestSVGManipulation(unittest.TestCase):
         c = Canvas()
         l = c.layer('Layer 1')
         o = l.elem.find('..')
-        print(l, o)
 
 
 # -------------------------------------------------------------------------------
